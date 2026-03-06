@@ -1,0 +1,126 @@
+/* ─── Page wrapper (full screen centred) ────────────────────────────── */
+.dashboard-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f6f6f8;
+  padding: 1rem;
+  font-family: 'Manrope', sans-serif;
+}
+
+/* ─── Card ───────────────────────────────────────────────────────────── */
+.dashboard-card {
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  padding: 2.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  animation: slideUp 0.35s ease;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Icon ───────────────────────────────────────────────────────────── */
+.dashboard-icon-circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+  margin-bottom: 1.25rem;
+}
+
+.dashboard-icon-circle .material-symbols-outlined {
+  font-size: 2.25rem;
+  color: #16a34a;
+}
+
+/* ─── Heading ─────────────────────────────────────────────────────────── */
+.dashboard-title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 0.25rem;
+  letter-spacing: -0.025em;
+}
+
+.dashboard-subtitle {
+  font-size: 0.9rem;
+  color: #64748b;
+  margin-bottom: 1.75rem;
+}
+
+/* ─── User info box ───────────────────────────────────────────────────── */
+.dashboard-info-box {
+  width: 100%;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.dashboard-info-row {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  text-align: left;
+}
+
+.dashboard-info-icon {
+  font-size: 1.5rem;
+  color: #0f172a;
+  flex-shrink: 0;
+}
+
+.dashboard-info-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.125rem;
+}
+
+.dashboard-info-value {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+  word-break: break-all;
+}
+
+/* ─── Logout button ──────────────────────────────────────────────────── */
+.logout-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.75rem;
+  background: #0f172a;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+}
+
+.logout-btn:hover  { opacity: 0.88; }
+.logout-btn:active { transform: scale(0.97); }
+
+.logout-btn .material-symbols-outlined {
+  font-size: 1.25rem;
+}
