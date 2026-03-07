@@ -39,6 +39,9 @@ describe("Login.cy.jsx", () => {
   it.only("should allow capitalized email", () => {
     cy.get('[data-cy="form-email"]').find("input").type("TEST@EXAMPLE.COM");
     cy.get('[data-cy="form-password"]').find("input").focus();
+    cy.get('[data-cy="form-email"]')
+      .find("input")
+      .should("not.have.class", "input-error");
   });
 
   it("should show error for email without @", () => {
