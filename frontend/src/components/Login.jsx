@@ -11,6 +11,14 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 function validateEmail(value) {
   if (!value.trim()) return "Email is required.";
   if (!EMAIL_REGEX.test(value)) return "Please enter a valid email address.";
+  const [local, domain] = value.split("@");
+  if (local.length > 64)
+    return "Email local part (before @) must be 64 characters or fewer.";
+  if (domain.length > 255)
+    return "Email domain (after @) must be 255 characters or fewer.";
+  const tld = domain.split(".").pop();
+  if (tld.length > 63)
+    return "Email TLD (after the last .) must be 63 characters or fewer.";
   return "";
 }
 

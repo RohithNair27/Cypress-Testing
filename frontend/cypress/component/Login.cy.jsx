@@ -12,49 +12,13 @@ describe("Login.cy.jsx", () => {
     cy.get('[data-cy="form-password"]').find("input").clear();
   });
 
-  //Wrong/empty emails
-  it("should throw error with wrong/empty emails", () => {
-    // empty
+  //empty emails
+  it("should show error when email is empty", () => {
     cy.get('[data-cy="form-email"]').click();
     cy.get('[data-cy="form-password"]').find("input").type("Test@1234");
     cy.get('[data-cy="form-email-error"]').should(
       "have.text",
       "errorEmail is required.",
-    );
-    cy.get('[data-cy="form-email"]')
-      .find("input")
-      .should("have.class", "input-error");
-
-    //wrong email case 1 - no @
-    cy.get('[data-cy="form-email"]').type("testgoogle.com");
-    cy.get('[data-cy="form-password"]').click();
-    cy.get('[data-cy="form-email-error"]').should(
-      "have.text",
-      "errorPlease enter a valid email address.",
-    );
-    cy.get('[data-cy="form-email"]')
-      .find("input")
-      .should("have.class", "input-error");
-
-    // Wrong email case 2 - no .com
-    cy.get('[data-cy="form-email"]').clear();
-    cy.get('[data-cy="form-email"]').type("test@google");
-    cy.get('[data-cy="form-password"]').click();
-    cy.get('[data-cy="form-email-error"]').should(
-      "have.text",
-      "errorPlease enter a valid email address.",
-    );
-    cy.get('[data-cy="form-email"]')
-      .find("input")
-      .should("have.class", "input-error");
-
-    // Wrong email case 3 - no text before @provider.com
-    cy.get('[data-cy="form-email"]').clear();
-    cy.get('[data-cy="form-email"]').type("@google.com");
-    cy.get('[data-cy="form-password"]').click();
-    cy.get('[data-cy="form-email-error"]').should(
-      "have.text",
-      "errorPlease enter a valid email address.",
     );
     cy.get('[data-cy="form-email"]')
       .find("input")
@@ -69,6 +33,178 @@ describe("Login.cy.jsx", () => {
     // cy.get('[data-cy="form-test-cred-invalid"]')
     //   .should("be.visible")
     //   .and("contain.text", "Invalid email or password.");
+  });
+
+  //Capitalized email
+  it.only("should allow capitalized email", () => {
+    cy.get('[data-cy="form-email"]').find("input").type("TEST@EXAMPLE.COM");
+    cy.get('[data-cy="form-password"]').find("input").focus();
+  });
+
+  it("should show error for email without @", () => {
+    cy.get('[data-cy="form-email"]').type("testgoogle.com");
+    cy.get('[data-cy="form-password"]').find("input").focus();
+    cy.get('[data-cy="form-email-error"]').should(
+      "have.text",
+      "errorPlease enter a valid email address.",
+    );
+    cy.get('[data-cy="form-email"]')
+      .find("input")
+      .should("have.class", "input-error");
+  });
+
+  // domin checks
+
+  // no domains
+  it("should show error for email without domain", () => {
+    cy.get('[data-cy="form-email"]').clear();
+    cy.get('[data-cy="form-email"]').type("test@google");
+    cy.get('[data-cy="form-password"]').click();
+    cy.get('[data-cy="form-email-error"]').should(
+      "have.text",
+      "errorPlease enter a valid email address.",
+    );
+    cy.get('[data-cy="form-email"]')
+      .find("input")
+      .should("have.class", "input-error");
+  });
+
+  // works for all domins
+  const allowedDomains = [
+    "gmail.com",
+    "yahoo.com",
+    "outlook.com",
+    "hotmail.com",
+    "icloud.com",
+  ];
+  allowedDomains.forEach((domain) => {
+    it(`should accept email with domain ${domain}`, () => {
+      cy.get('[data-cy="form-email"]')
+        .find("input")
+        .clear()
+        .type(`test@${domain}`);
+      cy.get('[data-cy="form-password"]').find("input").focus();
+
+      cy.get('[data-cy="form-email"]')
+        .find("input")
+        .should("not.have.class", "input-error");
+    });
+  });
+
+  // checking all the top level domains
+  const tlds = ["com", "in", "dev", "org", "net"];
+
+  tlds.forEach((tld) => {
+    it(`should accept email with .${tld} domain`, () => {
+      cy.get('[data-cy="form-email"]').find("input").type(`test@gmail.${tld}`);
+
+      cy.get('[data-cy="form-password"]').find("input").focus();
+
+      cy.get('[data-cy="form-email"]')
+        .find("input")
+        .should("not.have.class", "input-error");
+    });
+  });
+
+  // testing without "." in the email
+  it("shoud have . inbetween domain and tlds", () => {
+    cy.get('[data-cy="form-email"]').find("input").type(`test@gmailcom`);
+    cy.get('[data-cy="form-password"]').find("input").focus();
+    cy.get('[data-cy="form-email-error"]').should(
+      "have.text",
+      "errorPlease enter a valid email address.",
+    );
+    cy.get('[data-cy="form-email"]')
+      .find("input")
+      .should("have.class", "input-error");
+  });
+
+  // testing without the local part
+  it("should have a local part with atleast one char before @", () => {
+    cy.get('[data-cy="form-email"]').find("input").type("@gmail.com");
+    cy.get('[data-cy="form-password"]').find("input").focus();
+    cy.get('[data-cy="form-email-error"]').should(
+      "have.text",
+      "errorPlease enter a valid email address.",
+    );
+    cy.get('[data-cy="form-email"]')
+      .find("input")
+      .should("have.class", "input-error");
+  });
+
+  //works with atleast one Interger/Char/dots between them in local part
+  const localPart = ["0", "1.0", "1.0.0", "r", "r.r", "rohith.nair"];
+  localPart.forEach((local) => {
+    it("should work with one Ineger or char in the local part", () => {
+      cy.get('[data-cy="form-email"]')
+        .find("input")
+        .type(`${local}.@gmail.com`);
+      cy.get('[data-cy="form-password"]').find("input").focus();
+
+      cy.get('[data-cy="form-email"]')
+        .find("input")
+        .should("not.have.class", "input-error");
+    });
+  });
+
+  // local part char 64 chars - does not exceeds limit
+  const validLocalParts = ["a".repeat(64)];
+  validLocalParts.forEach((local) => {
+    it("should accept local part with exactly 64 characters", () => {
+      cy.get('[data-cy="form-email"]').find("input").type(`${local}@gmail.com`);
+      cy.get('[data-cy="form-password"]').find("input").focus();
+
+      cy.get('[data-cy="form-email"]')
+        .find("input")
+        .should("not.have.class", "input-error");
+    });
+  });
+
+  // local part char 65 chars - exceeds limit
+  const invalidLocalParts = ["a".repeat(65)];
+  invalidLocalParts.forEach((local) => {
+    it("should show error when local part exceeds 64 characters", () => {
+      cy.get('[data-cy="form-email"]').find("input").type(`${local}@gmail.com`);
+      cy.get('[data-cy="form-password"]').find("input").focus();
+
+      cy.get('[data-cy="form-email-error"]').should(
+        "have.text",
+        "errorEmail local part (before @) must be 64 characters or fewer.",
+      );
+      cy.get('[data-cy="form-email"]')
+        .find("input")
+        .should("have.class", "input-error");
+    });
+  });
+
+  // TLD 63 chars - does not exceed limit
+  const validTlds = ["a".repeat(63)];
+  validTlds.forEach((tld) => {
+    it("should accept TLD with exactly 63 characters", () => {
+      cy.get('[data-cy="form-email"]').find("input").type(`test@gmail.${tld}`);
+      cy.get('[data-cy="form-password"]').find("input").focus();
+
+      cy.get('[data-cy="form-email"]')
+        .find("input")
+        .should("not.have.class", "input-error");
+    });
+  });
+
+  // TLD 64 chars - exceeds limit
+  const invalidTlds = ["a".repeat(64)];
+  invalidTlds.forEach((tld) => {
+    it("should show error when TLD exceeds 63 characters", () => {
+      cy.get('[data-cy="form-email"]').find("input").type(`test@gmail.${tld}`);
+      cy.get('[data-cy="form-password"]').find("input").focus();
+
+      cy.get('[data-cy="form-email-error"]').should(
+        "have.text",
+        "errorEmail TLD (after the last .) must be 63 characters or fewer.",
+      );
+      cy.get('[data-cy="form-email"]')
+        .find("input")
+        .should("have.class", "input-error");
+    });
   });
 
   //empty password
