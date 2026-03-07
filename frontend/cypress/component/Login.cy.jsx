@@ -23,16 +23,6 @@ describe("Login.cy.jsx", () => {
     cy.get('[data-cy="form-email"]')
       .find("input")
       .should("have.class", "input-error");
-
-    // Correct email case3 -  Capitalized email
-    //TEST@EXAMPLE.COM
-    // cy.get('[data-cy="form-email"]').clear();
-    // cy.get('[data-cy="form-email"]').type("TEST@EXAMPLE.COM");
-    // cy.get('[data-cy="form-submit"]').click();
-
-    // cy.get('[data-cy="form-test-cred-invalid"]')
-    //   .should("be.visible")
-    //   .and("contain.text", "Invalid email or password.");
   });
 
   //Capitalized email
@@ -108,6 +98,15 @@ describe("Login.cy.jsx", () => {
         .should("not.have.class", "input-error");
     });
   });
+  // Domin without provider
+  it.only("should not allow missing domain name", () => {
+    cy.get('[data-cy="form-email"]').find("input").type("test@.com");
+    cy.get('[data-cy="form-password"]').find("input").focus();
+
+    cy.get('[data-cy="form-email"]')
+      .find("input")
+      .should("have.class", "input-error");
+  });
 
   // testing without "." in the email
   it("shoud have . inbetween domain and tlds", () => {
@@ -133,6 +132,15 @@ describe("Login.cy.jsx", () => {
     cy.get('[data-cy="form-email"]')
       .find("input")
       .should("have.class", "input-error");
+  });
+
+  //Should allow space in email - as the type is email it handles space
+  it.only("should not allow spaces in email", () => {
+    cy.get('[data-cy="form-email"]').find("input").type("test @gmail.com");
+    cy.get('[data-cy="form-password"]').find("input").focus();
+    cy.get('[data-cy="form-email"]')
+      .find("input")
+      .should("not.have.class", "input-error");
   });
 
   //works with atleast one Interger/Char/dots between them in local part
