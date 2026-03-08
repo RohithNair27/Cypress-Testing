@@ -23,6 +23,10 @@ router.post("/login", (req, res) => {
         console.error("[login] DB error:", err.message);
         return res.status(500).json({ error: "Internal server error." });
       }
+
+      // 3-second delay so the loading / disabled-button state can be tested
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+
       if (!user) {
         return res.status(401).json({ error: "Invalid email or password." });
       }

@@ -337,3 +337,36 @@ describe("Input password tests", () => {
     });
   });
 });
+
+describe("Submit button tests", () => {
+  beforeEach(() => {
+    cy.mount(
+      <MemoryRouter>
+        <Login />
+      </MemoryRouter>,
+    );
+    cy.getByCy("form-email").find("input").clear();
+    cy.getByCy("form-password").find("input").clear();
+  });
+
+  it.only("should disable the submit button and show loading text while request is pending", () => {
+    // Delay the response by 3 seconds
+    cy.intercept("POST", "http://localhost:4001/api/auth/login", (req) => {
+      req.reply((res) => {
+        res.setDelay(3000);
+      });
+    }).as("loginRequest");
+
+    cy.getByCy("form-email").find("input").type("test@example.com");
+    cy.getByCy("form-password").find("input").type("Test@1234");
+    cy.getByCy("form-submit").click();
+
+    cy.getByCy("form-submit").should("be.disabled");
+    cy.getByCy("form-submit").should("contain", "Please wait…");
+
+    cy.wait("@loginRequest");
+    cy.getByCy("form-submit").should("not.be.disabled");
+
+    cy.location("pathname").should("eq", "/dashboard");
+  });
+});
