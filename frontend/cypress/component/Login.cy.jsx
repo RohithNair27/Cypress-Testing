@@ -1,7 +1,7 @@
 import Login from "../../src/components/Login";
 import { MemoryRouter } from "react-router-dom";
 
-describe("Login.cy.jsx", () => {
+describe("Input email tests", () => {
   beforeEach(() => {
     cy.mount(
       <MemoryRouter>
@@ -159,7 +159,10 @@ describe("Login.cy.jsx", () => {
 
       cy.getByCy("form-email-error")
         .should("exist")
-        .and("contain", "Email local part (before @) must be 64 characters or fewer.");
+        .and(
+          "contain",
+          "Email local part (before @) must be 64 characters or fewer.",
+        );
       cy.getByCy("form-email")
         .find("input")
         .should("have.class", "input-error");
@@ -188,16 +191,30 @@ describe("Login.cy.jsx", () => {
 
       cy.getByCy("form-email-error")
         .should("exist")
-        .and("contain", "Email TLD (after the last .) must be 63 characters or fewer.");
+        .and(
+          "contain",
+          "Email TLD (after the last .) must be 63 characters or fewer.",
+        );
       cy.getByCy("form-email")
         .find("input")
         .should("have.class", "input-error");
     });
   });
+});
 
+describe("Input password tests", () => {
+  beforeEach(() => {
+    cy.mount(
+      <MemoryRouter>
+        <Login />
+      </MemoryRouter>,
+    );
+    cy.getByCy("form-email").find("input").clear();
+    cy.getByCy("form-password").find("input").clear();
+  });
   //empty password
   it("show throw error with empty password input", () => {
-    cy.getByCy("form-email").type("test@example.com");
+    cy.getByCy("form-email").find("input").type("test@example.com");
     cy.getByCy("form-password").click();
     cy.getByCy("form-password-error")
       .should("exist")
@@ -219,5 +236,53 @@ describe("Login.cy.jsx", () => {
     cy.getByCy("form-password")
       .find("input")
       .should("have.attr", "type", "password");
+  });
+
+  it.only("Should not allow less then 8 char", () => {
+    cy.getByCy("form-email").find("input").type("test@example.com");
+    cy.getByCy("form-password").find("input").type("Test@12");
+    cy.getByCy("form-email").find("input").focus();
+
+    cy.getByCy("form-password-error")
+      .should("exist")
+      .and("contain", "Password must be at least 8 characters.");
+  });
+
+  it.only("should have a upper case char", () => {
+    cy.getByCy("form-email").find("input").type("test@example.com");
+    cy.getByCy("form-password").find("input").type("test@1234");
+    cy.getByCy("form-email").find("input").focus();
+
+    cy.getByCy("form-password-error")
+      .should("exist")
+      .and("contain", "Password must contain at least one uppercase letter.");
+  });
+
+  it.only("should show error when password has no number", () => {
+    cy.getByCy("form-email").find("input").type("test@example.com");
+    cy.getByCy("form-password").find("input").type("Test@abcd");
+    cy.getByCy("form-email").find("input").focus();
+
+    cy.getByCy("form-password-error")
+      .should("exist")
+      .and("contain", "Password must contain at least one number.");
+  });
+
+  it.only("should show error when password has no special character", () => {
+    cy.getByCy("form-email").find("input").type("test@example.com");
+    cy.getByCy("form-password").find("input").type("Test1234");
+    cy.getByCy("form-email").find("input").focus();
+
+    cy.getByCy("form-password-error")
+      .should("exist")
+      .and("contain", "Password must contain at least one special character.");
+  });
+
+  it.only("should accept an all-uppercase password with number and special char", () => {
+    cy.getByCy("form-email").find("input").type("test@example.com");
+    cy.getByCy("form-password").find("input").type("TEST@1234");
+    cy.getByCy("form-email").find("input").focus();
+
+    cy.getByCy("form-password").find("input").should("not.have.class", "input-error");
   });
 });
