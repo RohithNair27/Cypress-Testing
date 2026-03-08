@@ -212,6 +212,16 @@ describe("Input password tests", () => {
     cy.getByCy("form-email").find("input").clear();
     cy.getByCy("form-password").find("input").clear();
   });
+  //happy path
+  it("should accept a valid password", () => {
+    cy.getByCy("form-email").find("input").type("test@example.com");
+    cy.getByCy("form-password").find("input").type("Test@1234");
+    cy.getByCy("form-email").find("input").focus();
+
+    cy.getByCy("form-password")
+      .find("input")
+      .should("not.have.class", "input-error");
+  });
   //empty password
   it("show throw error with empty password input", () => {
     cy.getByCy("form-email").find("input").type("test@example.com");
@@ -238,7 +248,18 @@ describe("Input password tests", () => {
       .should("have.attr", "type", "password");
   });
 
-  it.only("Should not allow less then 8 char", () => {
+  // Leading and trailing spaces
+  it("should trim or reject passwords with leading spaces", () => {
+    cy.getByCy("form-email").find("input").type("test@example.com");
+    cy.getByCy("form-password").find("input").type(" Test@1234");
+    cy.getByCy("form-email").find("input").focus();
+
+    cy.getByCy("form-password")
+      .find("input")
+      .should("not.have.class", "input-error");
+  });
+
+  it("Should not allow less then 8 char", () => {
     cy.getByCy("form-email").find("input").type("test@example.com");
     cy.getByCy("form-password").find("input").type("Test@12");
     cy.getByCy("form-email").find("input").focus();
@@ -248,7 +269,7 @@ describe("Input password tests", () => {
       .and("contain", "Password must be at least 8 characters.");
   });
 
-  it.only("should have a upper case char", () => {
+  it("should have a upper case char", () => {
     cy.getByCy("form-email").find("input").type("test@example.com");
     cy.getByCy("form-password").find("input").type("test@1234");
     cy.getByCy("form-email").find("input").focus();
@@ -258,7 +279,7 @@ describe("Input password tests", () => {
       .and("contain", "Password must contain at least one uppercase letter.");
   });
 
-  it.only("should show error when password has no number", () => {
+  it("should show error when password has no number", () => {
     cy.getByCy("form-email").find("input").type("test@example.com");
     cy.getByCy("form-password").find("input").type("Test@abcd");
     cy.getByCy("form-email").find("input").focus();
@@ -268,7 +289,7 @@ describe("Input password tests", () => {
       .and("contain", "Password must contain at least one number.");
   });
 
-  it.only("should show error when password has no special character", () => {
+  it("should show error when password has no special character", () => {
     cy.getByCy("form-email").find("input").type("test@example.com");
     cy.getByCy("form-password").find("input").type("Test1234");
     cy.getByCy("form-email").find("input").focus();
@@ -278,11 +299,41 @@ describe("Input password tests", () => {
       .and("contain", "Password must contain at least one special character.");
   });
 
-  it.only("should accept an all-uppercase password with number and special char", () => {
+  it("should accept an all-uppercase password with number and special char", () => {
     cy.getByCy("form-email").find("input").type("test@example.com");
     cy.getByCy("form-password").find("input").type("TEST@1234");
     cy.getByCy("form-email").find("input").focus();
 
-    cy.getByCy("form-password").find("input").should("not.have.class", "input-error");
+    cy.getByCy("form-password")
+      .find("input")
+      .should("not.have.class", "input-error");
+  });
+
+  // password length 128 chars - does not exceed limit
+  const validPasswords = ["A1@" + "a".repeat(125)];
+  validPasswords.forEach((pwd) => {
+    it("should accept password with exactly 128 characters", () => {
+      cy.getByCy("form-email").find("input").type("test@example.com");
+      cy.getByCy("form-password").find("input").type(pwd);
+      cy.getByCy("form-email").find("input").focus();
+
+      cy.getByCy("form-password")
+        .find("input")
+        .should("not.have.class", "input-error");
+    });
+  });
+
+  // password length 129 chars - exceeds limit
+  const invalidPasswords = ["A1@" + "a".repeat(126)];
+  invalidPasswords.forEach((pwd) => {
+    it("should show error when password exceeds 128 characters", () => {
+      cy.getByCy("form-email").find("input").type("test@example.com");
+      cy.getByCy("form-password").find("input").type(pwd);
+      cy.getByCy("form-email").find("input").focus();
+
+      cy.getByCy("form-password-error")
+        .should("exist")
+        .and("contain", "Password must be 128 characters or fewer.");
+    });
   });
 });
